@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <meta property="og:title" content="四子棋" />
+        <meta property="og:description" content="遊戲雙方輪流每次把一只棋子放進棋盤任何未全滿的一行中，棋子會占據一行中最底未被占據的位置。任何一方先以四只棋子在橫，豎或斜方向聯成一條直線，便可獲勝，遊戲亦結束。" />
+        <meta property="og:locale" content="zh_TW" />
+        <meta property="og:type" content="website" />
+        <link href="https://fonts.googleapis.com/css?family=Baloo+Chettan+2:400,700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="css/connect-four.css" />
+        <title>四子棋</title>
+    </head>
+    <body>
+        <div id="game">
+            <div id="winner-burst" :class="[currentTurnColor, gameOver && 'burst']"></div>
+
+            <div class="flex">
+                <p v-html="message" role="status"></p>
+                <button :disabled="!areThereMoves" @click="startNewGame">新遊戲</button>
+            </div>
+
+            <div id="button-board">
+                <div v-for="i in 8" :data-column="i - 1" @click.stop="dropPiece">
+                    <button :data-column="i - 1" @click.stop="dropPiece" @keydown="handleMoveCursor" @mouseover="handleHover" :aria-label="`Drop ${currentTurnColor} piece in column ${i}`" :tabindex="gameOver || isADraw ? '-1' : '0'">
+                        <span></span>
+                    </button>
+                    <div class="slot" :hidden="gameOver || isADraw" aria-hidden="true">
+                        <div :class="currentTurnColor">
+                            {{ getPieceIcon(currentTurnColor) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="board">
+                <template v-for="row, rowNumber in grid">
+                    <template v-for="slot, slotNumber in row">
+                        <div
+                            class="slot shadow"
+                            @click="dropPiece"
+                            @mouseover="handleSlotHover"
+                            :style="slot.color && `animation: drop 0.05s forwards steps(6)`"
+                            :data-row="rowNumber"
+                            :data-column="slotNumber"
+                            :key="`${rowNumber}${slotNumber}`"
+                            :aria-label="`${slot.color && slot.color + ' piece' || 'Blank slot'} in column ${slotNumber +1} of 8, row ${rowNumber +1} of 6.` "
+                        >
+                            <div v-if="slot.color" :class="[slot.color, gameOver && currentTurnColor != slot.color && 'loser']" aria-hidden="true">
+                                {{ getPieceIcon(slot.color) }}
+                            </div>
+                        </div>
+                    </template>
+                </template>
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js" defer></script>
+        <script src="js/connect-four.js" defer></script>
+    </body>
+</html>
